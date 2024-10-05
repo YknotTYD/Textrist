@@ -19,14 +19,13 @@ void display_board(char board[20][10]) {
     for (int y=0; y<20; y++) {
         for (int x=0; x<10; x++) {
         
-            chars[i]='\x1b';
-            chars[i+1]='[';
-            chars[i+2]=board[y][x];
-            chars[i+3]='m';
-            chars[i+4]='#';//board[y][x];
-            chars[i+5]=' ';
-            
-            i+=6;
+            chars[i++]='\x1b';
+            chars[i++]='[';
+            chars[i++]=board[y][x];
+            chars[i++]='m';
+            chars[i++]='#';
+            chars[i++]=' ';
+
         }
         chars[i++]='\n';
     }
@@ -39,7 +38,7 @@ int main (void) {
 
     for (int y=0; y<20; y++) {
         for (int x=0; x<10; x++) {
-            board[y][x]='2';
+            board[y][x]='6';
         }
     }
 
