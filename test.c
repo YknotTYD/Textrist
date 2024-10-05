@@ -18,6 +18,7 @@ void display_board(char board[20][10]) {
 
     for (int y=0; y<20; y++) {
         for (int x=0; x<10; x++) {
+        
             chars[i]='\x1b';
             chars[i+1]='[';
             chars[i+2]=board[y][x];
