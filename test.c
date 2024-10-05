@@ -28,8 +28,7 @@ void display_board(char board[20][10]) {
             
             i+=6;
         }
-        chars[i]='\n';
-        i++;
+        chars[i++]='\n';
     }
 
     write(1,&chars,size);
