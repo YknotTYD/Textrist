@@ -12,6 +12,7 @@
 //put everythong in a context_t
 //add menus
 //add a multiplayer mode
+//add an AI to play against
 
 context_t context;
 
@@ -39,8 +40,8 @@ static char *get_grid_color(int piece)
 static char *get_color(int x, int y)
 {
     for (int i = 0; i < 4; i++) {
-        if (x == context.pos[0] + vects[context.current_piece][0][i][0] &&
-            y == context.pos[1] + vects[context.current_piece][0][i][1]) {
+        if (x == context.pos[0] + vects[context.current_piece][context.rotation][i][0] &&
+            y == context.pos[1] + vects[context.current_piece][context.rotation][i][1]) {
             return get_grid_color(context.current_piece);
         }
     }
@@ -78,6 +79,7 @@ int main(void)
     context.pos[0] = 5;
     context.pos[1] = 5;
     context.current_piece = GRID_RAND;
+    context.rotation = 0;
 
     last_fall = NOW;
 

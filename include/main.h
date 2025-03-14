@@ -17,7 +17,7 @@
     #define GRID_SL 5
     #define GRID_SR 6
     #define GRID_NONE 7
-    #define GRID_RAND (rand() % 7)
+    #define GRID_RAND GRID_J//(rand() % 7)
 
     #define COLOR_DEFAULT "\x1b[0m"
     #define COLOR_BLACK "\x1b[48;2;0;0;0m"
@@ -41,11 +41,12 @@
 #include <stdlib.h>
 
 typedef struct {
+    char grid[20][10];
     struct termios old_termios, new_termios;
     int terminal_size[2];
-    int current_piece;
     int pos[2];
-    char grid[20][10];
+    int current_piece;
+    int rotation;
 } context_t;
 
 void enter_raw_mode(context_t *context);
@@ -56,7 +57,7 @@ void update_grid_fall(context_t *context);
 void update_grid_key(context_t *context, int key);
 void update_terminal_size(void);
 
-extern const int vects[7][1][4][2];
+extern const int vects[7][4][4][2];
 extern context_t context;
 
 #endif

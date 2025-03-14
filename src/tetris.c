@@ -2,14 +2,42 @@
 
 #include "../include/main.h"
 
-const int vects[7][1][4][2] = {
-    {{{-1, 1}, {1, 1},  {0, 1},   {0, 0}}},  //T
-    {{{0, -1}, {0, 0},  {0, 1},   {0, 2}}},  //I
-    {{{1, 1},  {0, 0},  {0, 1},   {1, 0}}},  //O
-    {{{0, -1}, {0, 0},  {0, 1},   {1, 1}}},  //L
-    {{{0, -1}, {0, 0},  {0, 1},   {-1, 1}}}, //J
-    {{{0, 0},  {-1, 0}, {-1, -1}, {0, 1}}},  //SL
-    {{{0, 0},  {1, 0},  {1, 1},   {0, -1}}}  //SR
+const int vects[7][4][4][2] = {
+    {{{-1, 1}, {1, 1},  {0, 1},   {0, 0}},
+     {{0, 2},  {1, 1},  {0, 1},   {0, 0}},
+     {{0, 2},  {1, 1},  {0, 1},   {-1, 1}},
+     {{0, 2},  {0, 0},  {0, 1},   {-1, 1}}},   //T (done)
+
+    {{{0, -1},  {0, 0},   {0, 1},    {0, 2}},
+     {{-1, -1}, {0, -1},  {1, -1},   {2, -1}},
+     {{-1, -1}, {-1, 0},  {-1, 1},   {-1, 2}},
+     {{-1, 0},  {0, 0},   {1, 0},    {2, 0}}}, //I (~done)
+
+    {{{1, 1},  {0, 0},  {0, 1},   {1, 0}},
+     {{1, 1},  {0, 0},  {0, 1},   {1, 0}},
+     {{1, 1},  {0, 0},  {0, 1},   {1, 0}},
+     {{1, 1},  {0, 0},  {0, 1},   {1, 0}}},    //O (done)
+
+    {{{0, -1}, {0, 0},  {0, 1},   {1, 1}},
+     {{-1, 0}, {0, 0},  {1, 0},   {-1, 1}},
+     {{0, -1}, {0, 0},  {0, 1},   {-1, -1}},
+     {{-1, 0}, {0, 0},  {1, 0},   {1, -1}}},   //L (done)
+
+    {{{0, -1}, {0, 0},  {0, 1},   {-1, 1}},
+     {{-1, 0}, {0, 0},  {1, 0},   {-1, -1}},
+     {{0, -1}, {0, 0},  {0, 1},   {1, -1}},
+     {{-1, 0}, {0, 0},  {1, 0},   {1, 1}}},    //J (done)
+
+    {{{0, 0},  {-1, 0}, {-1, -1}, {0, 1}},
+     {{0, 0},  {-1, 0}, {-1, -1}, {0, 1}},
+     {{0, 0},  {-1, 0}, {-1, -1}, {0, 1}},
+     {{0, 0},  {-1, 0}, {-1, -1}, {0, 1}}},    //SL
+
+    {{{0, 0},  {1, 0},  {1, 1},   {0, -1}},
+     {{0, 0},  {1, 0},  {1, 1},   {0, -1}},
+     {{0, 0},  {1, 0},  {1, 1},   {0, -1}},
+     {{0, 0},  {1, 0},  {1, 1},   {0, -1}}}    //SR
+
 };
 
 static int current_piece_is_free(context_t *context)
@@ -18,8 +46,8 @@ static int current_piece_is_free(context_t *context)
     int y;
 
     for (int i = 0; i < 4; i++) {
-        x = context->pos[0] + vects[context->current_piece][0][i][0];
-        y = context->pos[1] + vects[context->current_piece][0][i][1];
+        x = context->pos[0] + vects[context->current_piece][context->rotation][i][0];
+        y = context->pos[1] + vects[context->current_piece][context->rotation][i][1];
         if (x < 0 || x >= 10)
             return 0;
         if (y < 0 || y >= 20)
@@ -87,8 +115,8 @@ static void drop_piece(context_t *context)
 
     for (int i = 0; i < 4; i++) {
 
-        x = context->pos[0] + vects[context->current_piece][0][i][0];
-        y = context->pos[1] + vects[context->current_piece][0][i][1];
+        x = context->pos[0] + vects[context->current_piece][context->rotation][i][0];
+        y = context->pos[1] + vects[context->current_piece][context->rotation][i][1];
         if (x < 0 || x >= 10)
             continue;
         if (y < 0 || y >= 20)
@@ -104,6 +132,20 @@ static void drop_piece(context_t *context)
 
     context->current_piece = GRID_RAND;
 
+    return;
+}
+
+static void rotate_piece(context_t *context)
+{
+    int old_rotation;
+
+    old_rotation = context->rotation;
+    context->rotation = (context->rotation + 1) % 4;
+
+    if (current_piece_is_free(context)) {
+        return;
+    }
+    context->rotation = old_rotation;
     return;
 }
 
@@ -129,6 +171,9 @@ void update_grid_key(context_t *context, int key)
         try_to_go(context, 1, 0);
     }
     if (key == KEY_UP) {
+        rotate_piece(context);
+    }
+    if (key == ' ') {
         while (try_to_go(context, 0, 1) == 0);
         drop_piece(context);
     }
