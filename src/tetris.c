@@ -2,42 +2,41 @@
 
 #include "../include/main.h"
 
-int vects[][4][2] = {
-    {{-1, 1}, {1, 1},  {0, 1},   {0, 0}},  //T
-    {{0, -1}, {0, 0},  {0, 1},   {0, 2}},  //I
-    {{1, 1},  {0, 0},  {0, 1},   {1, 0}},  //O
-    {{0, -1}, {0, 0},  {0, 1},   {1, 1}},  //L
-    {{0, -1}, {0, 0},  {0, 1},   {-1, 1}}, //J
-    {{0, 0},  {-1, 0}, {-1, -1}, {0, 1}},  //SL
-    {{0, 0},  {1, 0},  {1, 1},   {0, -1}}  //SR
+const int vects[7][1][4][2] = {
+    {{{-1, 1}, {1, 1},  {0, 1},   {0, 0}}},  //T
+    {{{0, -1}, {0, 0},  {0, 1},   {0, 2}}},  //I
+    {{{1, 1},  {0, 0},  {0, 1},   {1, 0}}},  //O
+    {{{0, -1}, {0, 0},  {0, 1},   {1, 1}}},  //L
+    {{{0, -1}, {0, 0},  {0, 1},   {-1, 1}}}, //J
+    {{{0, 0},  {-1, 0}, {-1, -1}, {0, 1}}},  //SL
+    {{{0, 0},  {1, 0},  {1, 1},   {0, -1}}}  //SR
 };
-int terminal_size[2];
 
-static int current_piece_is_free(char grid[20][10], int pos[2], int current_piece)
+static int current_piece_is_free(context_t *context)
 {
     int x;
     int y;
 
     for (int i = 0; i < 4; i++) {
-        x = pos[0] + vects[current_piece][i][0];
-        y = pos[1] + vects[current_piece][i][1];
+        x = context->pos[0] + vects[context->current_piece][0][i][0];
+        y = context->pos[1] + vects[context->current_piece][0][i][1];
         if (x < 0 || x >= 10)
             return 0;
         if (y < 0 || y >= 20)
             return 0;
-        if (grid[y][x] != GRID_NONE)
+        if (context->grid[y][x] != GRID_NONE)
             return 0;
     }
     return 1;
 }
 
-static int try_to_go(char grid[20][10], int pos[2], int x, int y)
+static int try_to_go(context_t *context, int x, int y)
 {
-    pos[0] += x;
-    pos[1] += y;
-    if (!current_piece_is_free(grid, pos, current_piece)) {
-        pos[0] -= x;
-        pos[1] -= y;
+    context->pos[0] += x;
+    context->pos[1] += y;
+    if (!current_piece_is_free(context)) {
+        context->pos[0] -= x;
+        context->pos[1] -= y;
         return 1;
     }
     return 0;
@@ -55,7 +54,7 @@ static void ascend_line(char grid[20][10], int y)
     return;
 }
 
-static void update_lines(char grid[20][10])
+static void update_lines(context_t *context)
 {
     int has_empty;
 
@@ -64,7 +63,7 @@ static void update_lines(char grid[20][10])
         has_empty = 0;
 
         for (int x = 0; x < 10; x++) {
-            if (grid[y][x] == GRID_NONE) {
+            if (context->grid[y][x] == GRID_NONE) {
                 has_empty = 1;
                 break;
             }
@@ -72,66 +71,66 @@ static void update_lines(char grid[20][10])
 
         if (!has_empty) {
             for (int x = 0; x < 10; x++) {
-                grid[y][x] = GRID_NONE;
+                context->grid[y][x] = GRID_NONE;
             }
-            ascend_line(grid, y);
+            ascend_line(context->grid, y);
             y++;
         }
     }
     return;
 }
 
-static void drop_piece(char grid[20][10], int pos[2], int *current_piece)
+static void drop_piece(context_t *context)
 {
     int x;
     int y;
 
     for (int i = 0; i < 4; i++) {
 
-        x = pos[0] + vects[*current_piece][i][0];
-        y = pos[1] + vects[*current_piece][i][1];
+        x = context->pos[0] + vects[context->current_piece][0][i][0];
+        y = context->pos[1] + vects[context->current_piece][0][i][1];
         if (x < 0 || x >= 10)
             continue;
         if (y < 0 || y >= 20)
             continue;
-        grid[y][x] = *current_piece;
+        context->grid[y][x] = context->current_piece;
 
     }
 
-    update_lines(grid);
+    update_lines(context);
 
-    pos[0] = 4;
-    pos[1] = 0;
+    context->pos[0] = 4;
+    context->pos[1] = 0;
 
-    *current_piece = GRID_RAND;
+    context->current_piece = GRID_RAND;
 
     return;
 }
 
-void update_grid_fall(char grid[20][10], int pos[2], int *current_piece)
+void update_grid_fall(context_t *context)
 {
-    if (try_to_go(grid, pos, 0, 1)) {
-        drop_piece(grid, pos, current_piece);
+    if (try_to_go(context, 0, 1)) {
+        drop_piece(context);
     }
     return;
 }
 
-void update_grid_key(char grid[20][10], int pos[2], int key, int *current_piece)
+void update_grid_key(context_t *context, int key)
 {
     if (key == KEY_DOWN) {
-        if (try_to_go(grid, pos, 0, 1)) {
-            drop_piece(grid, pos, current_piece);
+        if (try_to_go(context, 0, 1)) {
+            drop_piece(context);
         }
     }
     if (key == KEY_LEFT) {
-        try_to_go(grid, pos, -1, 0);
+        try_to_go(context, -1, 0);
     }
     if (key == KEY_RIGHT) {
-        try_to_go(grid, pos, 1, 0);
+        try_to_go(context, 1, 0);
     }
     if (key == KEY_UP) {
-        while (try_to_go(grid, pos, 0, 1) == 0);
-        drop_piece(grid, pos, current_piece);
+        while (try_to_go(context, 0, 1) == 0);
+        drop_piece(context);
     }
     return;
 }

@@ -40,17 +40,23 @@
 #include <sys/ioctl.h>
 #include <stdlib.h>
 
-void enter_raw_mode(void);
-void exit_raw_mode(void);
+typedef struct {
+    struct termios old_termios, new_termios;
+    int terminal_size[2];
+    int current_piece;
+    int pos[2];
+    char grid[20][10];
+} context_t;
+
+void enter_raw_mode(context_t *context);
+void exit_raw_mode(context_t *context);
 void set_nonblocking(int fd);
 int read_key(void);
-void update_grid_fall(char grid[20][10], int pos[2], int *current_piece);
-void update_grid_key(char grid[20][10], int pos[2], int key, int *current_piece);
+void update_grid_fall(context_t *context);
+void update_grid_key(context_t *context, int key);
 void update_terminal_size(void);
 
-extern struct termios old_termios, new_termios;
-extern int vects[][4][2];
-extern int terminal_size[2];
-extern int current_piece;
+extern const int vects[7][1][4][2];
+extern context_t context;
 
 #endif

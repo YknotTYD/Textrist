@@ -2,18 +2,20 @@
 
 #include "../include/main.h"
 
-void enter_raw_mode(void)
+int terminal_size[2];
+
+void enter_raw_mode(context_t *context)
 {
-    tcgetattr(0, &old_termios);
-    new_termios = old_termios;
-    new_termios.c_lflag &= ~(ICANON | ECHO);
-    tcsetattr(0, TCSANOW, &new_termios);
+    tcgetattr(0, &context->old_termios);
+    context->new_termios = context->old_termios;
+    context->new_termios.c_lflag &= ~(ICANON | ECHO);
+    tcsetattr(0, TCSANOW, &context->new_termios);
     return;
 }
 
-void exit_raw_mode(void)
+void exit_raw_mode(context_t *context)
 {
-    tcsetattr(0, TCSANOW, &old_termios);
+    tcsetattr(0, TCSANOW, &context->old_termios);
     return;
 }
 

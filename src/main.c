@@ -11,11 +11,9 @@
 //add next piece display
 //put everythong in a context_t
 //add menus
+//add a multiplayer mode
 
-struct termios old_termios, new_termios;
-char grid[20][10];
-int pos[2];
-int current_piece;
+context_t context;
 
 static char *get_grid_color(int piece)
 {
@@ -41,12 +39,12 @@ static char *get_grid_color(int piece)
 static char *get_color(int x, int y)
 {
     for (int i = 0; i < 4; i++) {
-        if (x == pos[0] + vects[current_piece][i][0] &&
-            y == pos[1] + vects[current_piece][i][1]) {
-            return get_grid_color(current_piece);
+        if (x == context.pos[0] + vects[context.current_piece][0][i][0] &&
+            y == context.pos[1] + vects[context.current_piece][0][i][1]) {
+            return get_grid_color(context.current_piece);
         }
     }
-    return get_grid_color(grid[y][x]);
+    return get_grid_color(context.grid[y][x]);
 }
 
 static void display_grid(void)
@@ -67,19 +65,19 @@ int main(void)
     double last_fall;
 
     set_nonblocking(0);
-    enter_raw_mode();
+    enter_raw_mode(&context);
     printf("\x1b[?1049h");
     update_terminal_size();
 
     for (int y = 0; y < 20; y++) {
         for (int x = 0; x < 10; x++) {
-            grid[y][x] = GRID_NONE;
+            context.grid[y][x] = GRID_NONE;
         }
     }
 
-    pos[0] = 5;
-    pos[1] = 5;
-    current_piece = GRID_RAND;
+    context.pos[0] = 5;
+    context.pos[1] = 5;
+    context.current_piece = GRID_RAND;
 
     last_fall = NOW;
 
@@ -89,18 +87,18 @@ int main(void)
             break;
         }
         if (key) {
-            update_grid_key(grid, pos, key, &current_piece);
+            update_grid_key(&context, key);
             display_grid();
         }
         if (NOW - last_fall >= 1 / 3.0) {
-            update_grid_fall(grid, pos, &current_piece);
+            update_grid_fall(&context);
             display_grid();
             last_fall = NOW;
         }
     }
 
     printf("\x1b[?1049l");
-    exit_raw_mode();
+    exit_raw_mode(&context);
 
     return 0;
 }
