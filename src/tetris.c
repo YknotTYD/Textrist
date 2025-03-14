@@ -58,7 +58,7 @@ static int current_piece_is_free(context_t *context)
     return 1;
 }
 
-static int try_to_go(context_t *context, int x, int y)
+int try_to_go(context_t *context, int x, int y)
 {
     context->pos[0] += x;
     context->pos[1] += y;
@@ -138,6 +138,10 @@ static void drop_piece(context_t *context)
 static void rotate_piece(context_t *context)
 {
     int old_rotation;
+    static int rotation_vects[8][2] = {
+        {0, 1}, {1, 0}, {-1, 0}, {0, -1},
+        {0, 2}, {2, 0}, {-2, 0}, {0, -2}
+    };
 
     old_rotation = context->rotation;
     context->rotation = (context->rotation + 1) % 4;
@@ -145,7 +149,23 @@ static void rotate_piece(context_t *context)
     if (current_piece_is_free(context)) {
         return;
     }
+
+    for (int i = 0; i < 8; i++) {
+
+        context->pos[0] += rotation_vects[i][0];
+        context->pos[1] += rotation_vects[i][1];
+
+        if (current_piece_is_free(context)) {
+            return;
+        }
+
+        context->pos[0] -= rotation_vects[i][0];
+        context->pos[1] -= rotation_vects[i][1];
+
+    }
+
     context->rotation = old_rotation;
+
     return;
 }
 

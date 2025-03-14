@@ -13,6 +13,7 @@
 //add menus
 //add a multiplayer mode
 //add an AI to play against
+//add the actual rotations
 
 context_t context;
 
@@ -34,17 +35,41 @@ static char *get_grid_color(int piece)
         return COLOR_GREEN;
     if (piece == GRID_SR)
         return COLOR_RED;
+    if (piece == GRID_SHADOW)
+        return COLOR_WHITE;
     return COLOR_MAGENTA;
 }
 
 static char *get_color(int x, int y)
 {
+    int old_pos[2];
+
     for (int i = 0; i < 4; i++) {
         if (x == context.pos[0] + vects[context.current_piece][context.rotation][i][0] &&
             y == context.pos[1] + vects[context.current_piece][context.rotation][i][1]) {
             return get_grid_color(context.current_piece);
         }
     }
+
+    old_pos[0] = context.pos[0];
+    old_pos[1] = context.pos[1];
+
+    while (try_to_go(&context, 0, 1) == 0);
+
+    for (int i = 0; i < 4; i++) {
+        if (x == context.pos[0] + vects[context.current_piece][context.rotation][i][0] &&
+            y == context.pos[1] + vects[context.current_piece][context.rotation][i][1]) {
+
+            context.pos[0] = old_pos[0];
+            context.pos[1] = old_pos[1];
+
+            return get_grid_color(GRID_SHADOW);
+        }
+    }
+
+    context.pos[0] = old_pos[0];
+    context.pos[1] = old_pos[1];
+
     return get_grid_color(context.grid[y][x]);
 }
 

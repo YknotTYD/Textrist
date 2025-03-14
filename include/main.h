@@ -9,15 +9,16 @@
     #define KEY_LEFT  -3
     #define KEY_RIGHT -4
 
-    #define GRID_T 0
-    #define GRID_I 1
-    #define GRID_O 2
-    #define GRID_L 3
-    #define GRID_J 4
-    #define GRID_SL 5
-    #define GRID_SR 6
+    #define GRID_T    0
+    #define GRID_I    1
+    #define GRID_O    2
+    #define GRID_L    3
+    #define GRID_J    4
+    #define GRID_SL   5
+    #define GRID_SR   6
     #define GRID_NONE 7
-    #define GRID_RAND GRID_SR//(rand() % 7)
+    #define GRID_SHADOW 8
+    #define GRID_RAND (rand() % 7)
 
     #define COLOR_DEFAULT "\x1b[0m"
     #define COLOR_BLACK "\x1b[48;2;0;0;0m"
@@ -28,6 +29,7 @@
     #define COLOR_BLUE "\x1b[48;2;0;0;255m"
     #define COLOR_GREEN "\x1b[48;2;0;255;0m"
     #define COLOR_RED "\x1b[48;2;255;0;0m"
+    #define COLOR_WHITE "\x1b[48;2;255;255;255m"
     #define COLOR_MAGENTA "\x1b[48;2;255;0;255m"
 
     #define NOW (clock() / (double)CLOCKS_PER_SEC)
@@ -53,6 +55,7 @@ void enter_raw_mode(context_t *context);
 void exit_raw_mode(context_t *context);
 void set_nonblocking(int fd);
 int read_key(void);
+int try_to_go(context_t *context, int x, int y);
 void update_grid_fall(context_t *context);
 void update_grid_key(context_t *context, int key);
 void update_terminal_size(void);
