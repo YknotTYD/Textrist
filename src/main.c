@@ -4,16 +4,16 @@
 
 //make squares multiple chars to get like textures and stuff
 //make it also wasd
-//add shadows
 //add a held piece
 //add score
-//adde rotation
 //add next piece display
-//put everythong in a context_t
 //add menus
 //add a multiplayer mode
 //add an AI to play against
 //add the actual rotations
+//add achievements
+//add death
+//print everything with a single call to write
 
 context_t context;
 
@@ -73,6 +73,40 @@ static char *get_color(int x, int y)
     return get_grid_color(context.grid[y][x]);
 }
 
+void print_next_line(int y)
+{
+    int pos[2];
+    int color;
+    int is_in;
+
+    if (y == 0 || y % 6 == 0 || y == 19) {
+        return;
+    }
+
+    printf(COLOR_DEFAULT"  ");
+
+    for (int i = 0; i < 6; i++) {
+
+        pos[0] = i - 2;
+        pos[1] = y % 6 - 2;
+        color = context.incoming[y / 6];
+        is_in = 0;
+
+        for (int j = 0; j < 4; j++) {
+            if (pos[0] == vects[color][0][j][0] &&
+                pos[1] == vects[color][0][j][1]) {
+                is_in = 1;
+                break;
+            }
+        }
+
+        printf("%s  ", is_in ? get_grid_color(color) : COLOR_BLACK);
+
+    }
+
+    return;
+}
+
 static void display_grid(void)
 {
     printf("\x1b[0H");
@@ -80,7 +114,8 @@ static void display_grid(void)
         for (int x = 0; x < 10; x++) {
             printf("%s  ", get_color(x, y));
         }
-        printf(COLOR_DEFAULT"\n");
+        print_next_line(y);
+        printf("\n");
     }
     return;
 }
@@ -90,9 +125,10 @@ int main(void)
     int key;
     double last_fall;
 
+    srand(time(0));
     set_nonblocking(0);
     enter_raw_mode(&context);
-    printf("\x1b[?1049h");
+    printf("\x1b[?1049h\x1b[?25l");
     update_terminal_size();
 
     for (int y = 0; y < 20; y++) {
@@ -103,6 +139,9 @@ int main(void)
 
     context.pos[0] = 5;
     context.pos[1] = 5;
+    for (int i = 0; i < INCOMING_SIZE; i++) {
+        context.incoming[i] = GRID_RAND;
+    }
     context.current_piece = GRID_RAND;
     context.rotation = 0;
 
@@ -124,7 +163,7 @@ int main(void)
         }
     }
 
-    printf("\x1b[?1049l");
+    printf("\x1b[?1049l\x1b[?25h");
     exit_raw_mode(&context);
 
     return 0;

@@ -32,6 +32,8 @@
     #define COLOR_WHITE "\x1b[48;2;255;255;255m"
     #define COLOR_MAGENTA "\x1b[48;2;255;0;255m"
 
+    #define INCOMING_SIZE 3
+
     #define NOW (clock() / (double)CLOCKS_PER_SEC)
 
 #include <stdio.h>
@@ -47,6 +49,7 @@ typedef struct {
     struct termios old_termios, new_termios;
     int terminal_size[2];
     int pos[2];
+    int incoming[INCOMING_SIZE];
     int current_piece;
     int rotation;
 } context_t;

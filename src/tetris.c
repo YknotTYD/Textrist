@@ -108,6 +108,19 @@ static void update_lines(context_t *context)
     return;
 }
 
+static void cycle_incoming(context_t *context)
+{
+    context->current_piece = context->incoming[0];
+
+    for (int i = 0; i < INCOMING_SIZE; i++) {
+        context->incoming[i] =     context->incoming[i + 1] ^ context->incoming[i];
+        context->incoming[i + 1] = context->incoming[i + 1] ^ context->incoming[i];
+        context->incoming[i] =     context->incoming[i + 1] ^ context->incoming[i];
+    }
+    context->incoming[INCOMING_SIZE - 1] = GRID_RAND;
+    return;
+}
+
 static void drop_piece(context_t *context)
 {
     int x;
@@ -130,7 +143,7 @@ static void drop_piece(context_t *context)
     context->pos[0] = 4;
     context->pos[1] = 0;
 
-    context->current_piece = GRID_RAND;
+    cycle_incoming(context);
 
     return;
 }
