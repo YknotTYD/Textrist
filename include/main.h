@@ -17,7 +17,7 @@
     #define GRID_SL 5
     #define GRID_SR 6
     #define GRID_NONE 7
-    #define GRID_RAND GRID_J//(rand() % 7)
+    #define GRID_RAND GRID_SR//(rand() % 7)
 
     #define COLOR_DEFAULT "\x1b[0m"
     #define COLOR_BLACK "\x1b[48;2;0;0;0m"
