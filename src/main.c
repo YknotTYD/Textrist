@@ -19,16 +19,23 @@ int current_piece;
 
 static char *get_grid_color(int piece)
 {
-    if (piece == GRID_NONE) {
+    if (piece == GRID_NONE)
         return COLOR_BLACK;
-    }
-    if (piece == GRID_T) {
+    if (piece == GRID_T)
         return COLOR_PURPLE;
-    }
-    if (piece == GRID_I) {
+    if (piece == GRID_I)
         return COLOR_CYAN;
-    }
-    return COLOR_GREEN;
+    if (piece == GRID_O)
+        return COLOR_YELLOW;
+    if (piece == GRID_L)
+        return COLOR_ORANGE;
+    if (piece == GRID_J)
+        return COLOR_BLUE;
+    if (piece == GRID_SL)
+        return COLOR_GREEN;
+    if (piece == GRID_SR)
+        return COLOR_RED;
+    return COLOR_MAGENTA;
 }
 
 static char *get_color(int x, int y)

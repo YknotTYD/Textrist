@@ -11,14 +11,24 @@
 
     #define GRID_T 0
     #define GRID_I 1
-    #define GRID_NONE 2
-    #define GRID_RAND (rand() % 2)
+    #define GRID_O 2
+    #define GRID_L 3
+    #define GRID_J 4
+    #define GRID_SL 5
+    #define GRID_SR 6
+    #define GRID_NONE 7
+    #define GRID_RAND (rand() % 7)
 
     #define COLOR_DEFAULT "\x1b[0m"
     #define COLOR_BLACK "\x1b[48;2;0;0;0m"
     #define COLOR_PURPLE "\x1b[48;2;222;0;255m"
     #define COLOR_CYAN "\x1b[48;2;0;255;255m"
+    #define COLOR_YELLOW "\x1b[48;2;255;255;0m"
+    #define COLOR_ORANGE "\x1b[48;2;255;177;0m"
+    #define COLOR_BLUE "\x1b[48;2;0;0;255m"
     #define COLOR_GREEN "\x1b[48;2;0;255;0m"
+    #define COLOR_RED "\x1b[48;2;255;0;0m"
+    #define COLOR_MAGENTA "\x1b[48;2;255;0;255m"
 
     #define NOW (clock() / (double)CLOCKS_PER_SEC)
 
