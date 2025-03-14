@@ -4,23 +4,42 @@
 
 //make squares multiple chars to get like textures and stuff
 //make it also wasd
+//add shadows
+//add a held piece
+//add score
+//adde rotation
+//add next piece display
+//put everythong in a context_t
+//add menus
 
 struct termios old_termios, new_termios;
 char grid[20][10];
 int pos[2];
+int current_piece;
+
+static char *get_grid_color(int piece)
+{
+    if (piece == GRID_NONE) {
+        return COLOR_BLACK;
+    }
+    if (piece == GRID_T) {
+        return COLOR_PURPLE;
+    }
+    if (piece == GRID_I) {
+        return COLOR_CYAN;
+    }
+    return COLOR_GREEN;
+}
 
 static char *get_color(int x, int y)
 {
     for (int i = 0; i < 4; i++) {
-        if (x == pos[0] + vects[0][i][0] &&
-            y == pos[1] + vects[0][i][1]) {
-            return COLOR_PURPLE;
+        if (x == pos[0] + vects[current_piece][i][0] &&
+            y == pos[1] + vects[current_piece][i][1]) {
+            return get_grid_color(current_piece);
         }
     }
-    if (grid[y][x] == GRID_NONE) {
-        return COLOR_BLACK;
-    }
-    return COLOR_GREEN;
+    return get_grid_color(grid[y][x]);
 }
 
 static void display_grid(void)
@@ -53,6 +72,7 @@ int main(void)
 
     pos[0] = 5;
     pos[1] = 5;
+    current_piece = GRID_RAND;
 
     last_fall = NOW;
 
@@ -62,11 +82,11 @@ int main(void)
             break;
         }
         if (key) {
-            update_grid_key(grid, pos, key);
+            update_grid_key(grid, pos, key, &current_piece);
             display_grid();
         }
         if (NOW - last_fall >= 1 / 3.0) {
-            update_grid_fall(grid, pos);
+            update_grid_fall(grid, pos, &current_piece);
             display_grid();
             last_fall = NOW;
         }

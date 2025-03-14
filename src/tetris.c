@@ -2,19 +2,20 @@
 
 #include "../include/main.h"
 
-int vects[1][4][2] = {
-    {{-1, 1}, {1, 1}, {0, 1}, {0, 0}}
+int vects[][4][2] = {
+    {{-1, 1}, {1, 1}, {0, 1}, {0, 0}},
+    {{0, -1}, {0, 0}, {0, 1}, {0, 2}}
 };
 int terminal_size[2];
 
-static int current_piece_is_free(char grid[20][10], int pos[2])
+static int current_piece_is_free(char grid[20][10], int pos[2], int current_piece)
 {
     int x;
     int y;
 
     for (int i = 0; i < 4; i++) {
-        x = pos[0] + vects[0][i][0];
-        y = pos[1] + vects[0][i][1];
+        x = pos[0] + vects[current_piece][i][0];
+        y = pos[1] + vects[current_piece][i][1];
         if (x < 0 || x >= 10)
             return 0;
         if (y < 0 || y >= 20)
@@ -25,11 +26,11 @@ static int current_piece_is_free(char grid[20][10], int pos[2])
     return 1;
 }
 
-int try_to_go(char grid[20][10], int pos[2], int x, int y)
+static int try_to_go(char grid[20][10], int pos[2], int x, int y)
 {
     pos[0] += x;
     pos[1] += y;
-    if (!current_piece_is_free(grid, pos)) {
+    if (!current_piece_is_free(grid, pos, current_piece)) {
         pos[0] -= x;
         pos[1] -= y;
         return 1;
@@ -37,16 +38,85 @@ int try_to_go(char grid[20][10], int pos[2], int x, int y)
     return 0;
 }
 
-void update_grid_fall(char grid[20][10], int pos[2])
+static void ascend_line(char grid[20][10], int y)
 {
-    try_to_go(grid, pos, 0, 1);
+    for (int i = y; i >= 1; i--) {
+        for (int x = 0; x < 10; x++) {
+            grid[i][x] = grid[i - 1][x] ^ grid[i][x];
+            grid[i - 1][x] = grid[i - 1][x] ^ grid[i][x];
+            grid[i][x] = grid[i - 1][x] ^ grid[i][x];
+        }
+    }
     return;
 }
 
-void update_grid_key(char grid[20][10], int pos[2], int key)
+static void update_lines(char grid[20][10])
+{
+    int has_empty;
+
+    for (int y = 19; y >= 0; y--) {
+
+        has_empty = 0;
+
+        for (int x = 0; x < 10; x++) {
+            if (grid[y][x] == GRID_NONE) {
+                has_empty = 1;
+                break;
+            }
+        }
+
+        if (!has_empty) {
+            for (int x = 0; x < 10; x++) {
+                grid[y][x] = GRID_NONE;
+            }
+            ascend_line(grid, y);
+            y++;
+        }
+    }
+    return;
+}
+
+static void drop_piece(char grid[20][10], int pos[2], int *current_piece)
+{
+    int x;
+    int y;
+
+    for (int i = 0; i < 4; i++) {
+
+        x = pos[0] + vects[*current_piece][i][0];
+        y = pos[1] + vects[*current_piece][i][1];
+        if (x < 0 || x >= 10)
+            continue;
+        if (y < 0 || y >= 20)
+            continue;
+        grid[y][x] = *current_piece;
+
+    }
+
+    update_lines(grid);
+
+    pos[0] = 4;
+    pos[1] = 0;
+
+    *current_piece = GRID_RAND;
+
+    return;
+}
+
+void update_grid_fall(char grid[20][10], int pos[2], int *current_piece)
+{
+    if (try_to_go(grid, pos, 0, 1)) {
+        drop_piece(grid, pos, current_piece);
+    }
+    return;
+}
+
+void update_grid_key(char grid[20][10], int pos[2], int key, int *current_piece)
 {
     if (key == KEY_DOWN) {
-        try_to_go(grid, pos, 0, 1);
+        if (try_to_go(grid, pos, 0, 1)) {
+            drop_piece(grid, pos, current_piece);
+        }
     }
     if (key == KEY_LEFT) {
         try_to_go(grid, pos, -1, 0);
@@ -56,6 +126,7 @@ void update_grid_key(char grid[20][10], int pos[2], int key)
     }
     if (key == KEY_UP) {
         while (try_to_go(grid, pos, 0, 1) == 0);
+        drop_piece(grid, pos, current_piece);
     }
     return;
 }
