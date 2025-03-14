@@ -14,6 +14,7 @@
 //add achievements
 //add death
 //print everything with a single call to write
+//put everythin in more files
 
 context_t context;
 
@@ -107,10 +108,30 @@ void print_next_line(int y)
     return;
 }
 
+static void print_previous_line(int y)
+{
+    for (int i = 0; i < 8; i++) {
+        if (i == 0 || y > 4 || i > 6) {
+            printf(COLOR_DEFAULT"  ");
+            continue;
+        }
+        /*for (int j = 0; j < 4; j++) {
+            if (pos[0] == vects[color][0][j][0] &&
+                pos[1] == vects[color][0][j][1]) {
+                is_in = 1;
+                break;
+            }
+        }*/
+        printf(COLOR_BLACK"  ");
+    }
+    return;
+}
+
 static void display_grid(void)
 {
-    printf("\x1b[0H");
+    printf("\x1b[0H"COLOR_DEFAULT"\n");
     for (int y = 0; y < 20; y++) {
+        print_previous_line(y);
         for (int x = 0; x < 10; x++) {
             printf("%s  ", get_color(x, y));
         }
