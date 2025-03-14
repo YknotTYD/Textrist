@@ -24,14 +24,18 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <time.h>
+#include <sys/ioctl.h>
 
 void enter_raw_mode(void);
 void exit_raw_mode(void);
 void set_nonblocking(int fd);
 int read_key(void);
-void update_grid(char grid[20][10], int pos[2]);
+void update_grid_fall(char grid[20][10], int pos[2]);
+void update_grid_key(char grid[20][10], int pos[2], int key);
+void update_terminal_size(void);
 
 extern struct termios old_termios, new_termios;
 extern int vects[1][4][2];
+extern int terminal_size[2];
 
 #endif

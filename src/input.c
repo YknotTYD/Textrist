@@ -54,3 +54,13 @@ int read_key(void)
 
     return 0;
 }
+
+void update_terminal_size(void)
+{
+    static struct winsize w;
+
+    ioctl(1, TIOCGWINSZ, &w);
+    terminal_size[0] = w.ws_row;
+    terminal_size[1] = w.ws_col;
+    return;
+}

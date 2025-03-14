@@ -2,6 +2,9 @@
 
 #include "../include/main.h"
 
+//make squares multiple chars to get like textures and stuff
+//make it also wasd
+
 struct termios old_termios, new_termios;
 char grid[20][10];
 int pos[2];
@@ -40,6 +43,7 @@ int main(void)
     set_nonblocking(0);
     enter_raw_mode();
     printf("\x1b[?1049h");
+    update_terminal_size();
 
     for (int y = 0; y < 20; y++) {
         for (int x = 0; x < 10; x++) {
@@ -57,8 +61,12 @@ int main(void)
         if (key == 'q') {
             break;
         }
+        if (key) {
+            update_grid_key(grid, pos, key);
+            display_grid();
+        }
         if (NOW - last_fall >= 1 / 3.0) {
-            update_grid(grid, pos);
+            update_grid_fall(grid, pos);
             display_grid();
             last_fall = NOW;
         }
