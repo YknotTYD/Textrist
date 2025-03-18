@@ -6,7 +6,7 @@
 ##
 
 SRC  = $(shell find -iname *.c)
-NAME = Textris
+NAME = textris
 
 compile:
 	@ gcc -g -Wall -Wextra $(SRC) $(LIBS) \
@@ -23,6 +23,9 @@ valgrind: compile
 		--error-limit=no \
 	./$(NAME)
 	@ rm $(NAME)
+
+update: re
+	sudo mv $(NAME) /usr/local/bin
 
 clean:
 	@ rm -fr *.o

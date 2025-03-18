@@ -34,6 +34,9 @@
 
     #define INCOMING_SIZE 3
 
+    #define DEFAULT_X 4
+    #define DEFAULT_Y 0
+
     #define NOW (clock() / (double)CLOCKS_PER_SEC)
 
 #include <stdio.h>
@@ -51,7 +54,9 @@ typedef struct {
     int pos[2];
     int incoming[INCOMING_SIZE];
     int current_piece;
+    int held_piece;
     int rotation;
+    int can_switch_held;
 } context_t;
 
 void enter_raw_mode(context_t *context);
@@ -62,6 +67,7 @@ int try_to_go(context_t *context, int x, int y);
 void update_grid_fall(context_t *context);
 void update_grid_key(context_t *context, int key);
 void update_terminal_size(void);
+void display_grid(void);
 
 extern const int vects[7][4][4][2];
 extern context_t context;

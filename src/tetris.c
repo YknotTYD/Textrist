@@ -143,6 +143,8 @@ static void drop_piece(context_t *context)
     context->pos[0] = 4;
     context->pos[1] = 0;
 
+    context->can_switch_held = 1;
+
     cycle_incoming(context);
 
     return;
@@ -190,6 +192,28 @@ void update_grid_fall(context_t *context)
     return;
 }
 
+static void switch_held(context_t *context)
+{
+    if (context->can_switch_held == 0) {
+        return;
+    }
+    if (context->held_piece != GRID_NONE) {
+        context->held_piece    = context->current_piece ^ context->held_piece;
+        context->current_piece = context->current_piece ^ context->held_piece;
+        context->held_piece    = context->current_piece ^ context->held_piece;
+    } else {
+        context->held_piece = context->current_piece;
+        context->current_piece = context->incoming[0];
+        cycle_incoming(context);
+    }
+    context->pos[0] = DEFAULT_X;
+    context->pos[1] = DEFAULT_Y;
+
+    context->rotation = 0;
+    context->can_switch_held = 0;
+    return;
+}
+
 void update_grid_key(context_t *context, int key)
 {
     if (key == KEY_DOWN) {
@@ -209,6 +233,9 @@ void update_grid_key(context_t *context, int key)
     if (key == ' ') {
         while (try_to_go(context, 0, 1) == 0);
         drop_piece(context);
+    }
+    if (key == '\n') {
+        switch_held(context);
     }
     return;
 }
